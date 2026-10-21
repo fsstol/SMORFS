@@ -1,0 +1,39 @@
+# SEER data and anything derived from it must never be committed (SEER data-use agreement; data/README.md)
+data/single-multiple/
+data/**/single*.csv
+data/**/single*.pkl
+data/**/single_race*
+data/**/multiple.csv
+data/**/populations*.csv
+output/urinary bladder_rates.csv
+output/IMIS2*/
+output/table2_mle/
+output/benchmark/reference_targets.csv
+output/benchmark/R_stdout.txt
+verification/reference_targets.csv
+verification/benchmark_table.csv
+
+# the synthetic working copy and its collected results (tools/synthetic_data.py)
+synthetic_run/
+output/synthetic/
+
+# build products
+*.so
+*.dll
+*.dylib
+*.o
+*.dSYM/
+build/
+
+# Python, R, editors, macOS
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+.Rhistory
+.RData
+.Rproj.user/
+.idea/
+.vscode/
+.DS_Store

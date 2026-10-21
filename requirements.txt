@@ -1,0 +1,29 @@
+# Python 3.12.15. These are the versions of the environment that produced the results (CHANGES.md, entries 19
+# and 36): conda env `smorfs` on macOS 26.6.2, Apple M4 Max. environment.yml lists the same environment in full.
+# The C++ library is built with `bash compile.sh` (any C++20 compiler; Apple clang 21.0.0 was used).
+# Table 3 also needs R (4.5.3 was used); verification/bladder_reference_check.R uses base R only.
+
+# imported by the code
+numpy==2.4.4
+scipy==1.17.1
+pandas==3.0.6
+matplotlib==3.11.2
+seaborn==0.13.2
+progressbar2==4.6.0
+tqdm==4.70.1
+
+# their dependencies, pinned to the same environment
+contourpy==1.4.0
+cycler==0.12.1
+fonttools==4.66.1
+kiwisolver==1.5.1
+packaging==26.3
+pillow==12.3.0
+pyparsing==3.3.3
+python-dateutil==2.9.0.post0
+python-utils==4.1.2
+six==1.17.0
+typing_extensions==4.16.0
+
+# used by tests/test_risks.py only (50-digit references); installed in the conda env smorfs with pip
+mpmath==1.3.0
