@@ -16,8 +16,6 @@ import numpy as np
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 VER = os.path.join(ROOT, "verification")
 TABLE2 = os.path.join(ROOT, "output", "urinary bladder.npy")
-PUBLISHED = os.path.join(VER, "published_targets.csv")  # a table built from the SEER data; not in this repository
-CORRECTED = os.path.join(VER, "corrected_targets.csv")  # a table built from the SEER data; not in this repository
 LIBRARY = "semi_markov.dll" if sys.platform == "win32" else "semi_markov.so"  # as src/semi_markov/base.py
 DATA_FILES = ["US_life_table_2021.csv",
               "single-multiple/rates_urinary_bladder.csv",
