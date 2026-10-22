@@ -175,3 +175,32 @@ entry whose check needs the SEER data says "verified on the SEER data; not in th
   dimension of 0 to the BLAS. The BLAS stopped the process. v2 returned empty arrays.
 - **Now:** an empty product returns at once, so the results are empty arrays of the right shapes, as in v2.
 - **Test:** `emptygrid`.
+
+## Since v1.0.0
+
+### 16. Targets: the person-years of clinical mortality and of the deaths at diagnosis
+
+- **Where:** `src/main.py`: `corrected_denominators`, `seer17_person_years`, `apply_corrected_denominators`,
+  called from `main_rates`. Also `verification/h2.py`, `exact_targets`.
+- **v1.0.0 and v2:** each family was divided by the population of its own data file, and two of those populations
+  did not belong to the counts.
+  - Clinical mortality used the incidence-based mortality file's person-years of the years of death 2000 to 2021.
+    But only cases diagnosed from 2004 have a stage, so the deaths in the targets come from those cases.
+  - The deaths at diagnosis, SEER 17's cases diagnosed in 2004 to 2021, used the populations stored in the pickle.
+    Those cover a larger area: by single year of age they match the SEER 22 area (`data/README.md`).
+  - Both families' denominators were therefore too large, and their targets too low.
+- **Now:** all four families share one denominator, SEER 17's person-years for 2004 to 2021 by single year of age,
+  from the rates file. These are the clinical incidence targets' own person-years, which are unchanged.
+  - `main.corrected_denominators = False` gives the old targets.
+  - Refitted on the corrected targets, the rates of progression and diagnosis out of the preclinical states are 36%
+    to 45% lower, and the death rates after diagnosis 19% to 66% higher (Table 2).
+- **Test:** `denominators`, on synthetic data. Its checks:
+  - the incidence targets are unchanged;
+  - every mortality and deaths-at-diagnosis target is count / the rates file's 2004 to 2021 person-years, computed
+    from the files directly;
+  - `False` reproduces the old denominators;
+  - a missing year of diagnosis raises.
+
+  On the SEER data the targets were also checked against a table built independently of `main.py`, and the
+  original targets against the published tables. That check is verified on the SEER data and is not in the public
+  suite.
