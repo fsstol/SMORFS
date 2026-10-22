@@ -13,17 +13,25 @@ output/synthetic/ under a "SYNTHETIC" name.
 How the data are made. The model is evaluated at the committed MLE (output/urinary bladder mle.npy, the generating
 parameters) with main.py's own target machinery: verification/h2.py builds the targets from a template of the three
 files (every count 0), and eval_targets(return_targets=True) gives the model's rate for every family, stage group and
-single year of age 0 to 84. Each count is then Poisson(rate x person-years), with these stated SYNTHETIC person-years
-for every single year of age (the same for every stage, as in SEER's rate sessions):
-    clinical incidence        rates_urinary_bladder.csv        PERSON_YEARS["incidence"]
-    clinical mortality        mortality_urinary_bladder.csv    PERSON_YEARS["mortality"]
-    preclinical mortality     doa_urinary bladder.pkl, outcome 1  PERSON_YEARS["doa"]
-    preclinical other mortality  doa_urinary bladder.pkl, outcome 2  PERSON_YEARS["doa"]
+single year of age 0 to 84. Each count is then Poisson(rate x person-years), with the stated SYNTHETIC person-years
+PERSON_YEARS["incidence"] for every family and every single year of age (the same for every stage, as in SEER's rate
+sessions). As main.py's targets do (main.corrected_denominators, the default), every family's denominator is the rates
+file's person-years:
+    clinical incidence           rates_urinary_bladder.csv           single years of diagnosis 2004 to 2021, whose
+                                                                     populations sum to PERSON_YEARS["incidence"]
+    clinical mortality           mortality_urinary_bladder.csv       counts on the same person-years
+    preclinical mortality        doa_urinary bladder.pkl, outcome 1  counts on the same person-years
+    preclinical other mortality  doa_urinary bladder.pkl, outcome 2  counts on the same person-years
+The mortality file and the pickle also carry their own Population columns, as the SEER files do:
+PERSON_YEARS["mortality"] and PERSON_YEARS["doa"]. main.py's default does not use them; with
+corrected_denominators = False it would, and its mortality and deaths-at-diagnosis targets would then be too low by
+the ratio of the two (the error corrected in CORRECTIONS.md, entry 16).
 The Early group's count is split between SEER's "In situ" (EARLY_IN_SITU_SHARE) and "Localized" stages by drawing each
 as an independent Poisson count, so their sum is Poisson(rate x person-years); Medium is "Regional" and Late
-"Distant". Age 85+ gets count 0 (main.py does not use it). Crude rates, standard errors and exact Poisson 95% limits
-are written as SEER*Stat prints them (per 100,000, six decimals; "~" for the SE of a zero count). The year of
-diagnosis is the single label "synthetic"; main.py drops only the "2000-2021" aggregate. The seed is fixed (--seed).
+"Distant". Age 85+ gets count 0 (main.py does not use it). An incidence count is spread over the 18 years of diagnosis
+in proportion to their populations (largest remainders), which leaves its total, the only thing main.py uses, as drawn.
+Crude rates, standard errors and exact Poisson 95% limits are written as SEER*Stat prints them (per 100,000, six
+decimals; "~" for the SE of a zero count). The seed is fixed (--seed).
 
 The pipeline (--pipeline), all in the working copy:
   1. MLE: main.py's default optimizer from output/urinary bladder.npy (tests/common.run_refit), the SEs from the
@@ -56,7 +64,21 @@ CANCER_DEATH = "Dead (attributable to this cancer dx)"
 YEAR = "Year of diagnosis"
 AGES = [f"{a:02d} years" for a in range(85)] + ["85+ years"]
 SEER_STAGES = {"Early": ["In situ", "Localized"], "Medium": ["Regional"], "Late": ["Distant"]}
-PERSON_YEARS = {"incidence": 20_000_000, "mortality": 20_000_000, "doa": 30_000_000}  # SYNTHETIC, per year of age
+# SYNTHETIC, per single year of age: the rates file's (every family's denominator), and the Population columns of the
+# mortality file and the pickle (not used by main.py's default; see the docstring)
+PERSON_YEARS = {"incidence": 20_000_000, "mortality": 24_000_000, "doa": 36_000_000}
+YEARS = list(range(2004, 2022))  # single years of diagnosis in the rates file
+
+
+def split(total, weights):
+    """total spread over len(weights) integers in proportion to weights (largest remainders); they sum to total."""
+    exact = total * np.asarray(weights, float) / np.sum(weights)
+    parts = np.floor(exact).astype(np.int64)
+    parts[np.argsort(-(exact - parts), kind="stable")[:total - int(parts.sum())]] += 1
+    return parts
+
+
+YEAR_POPULATIONS = split(PERSON_YEARS["incidence"], np.ones(len(YEARS)))
 EARLY_IN_SITU_SHARE = 0.2
 SEED = 20261020
 MARKER = "SYNTHETIC_DATA.md"
@@ -80,8 +102,8 @@ def write_data(data_dir, counts):
     rows = []
     for st in stages:
         for a in AGES:
-            c = counts["incidence"].get((st, a), 0)
-            rows.append([st, "synthetic", a, *seer_numbers(c, PERSON_YEARS["incidence"]), c, PERSON_YEARS["incidence"]])
+            for y, c, pop in zip(YEARS, split(counts["incidence"].get((st, a), 0), YEAR_POPULATIONS), YEAR_POPULATIONS):
+                rows.append([st, y, a, *seer_numbers(int(c), int(pop)), int(c), int(pop)])
     pd.DataFrame(rows, columns=[STAGE, YEAR, AGE_RATES, "Crude Rate", "Standard Error", "Lower Confidence Interval",
                                 "Upper Confidence Interval", "Count", "Population"]).to_csv(
         os.path.join(data_dir, "single-multiple", FILES["incidence"]), index=False)
@@ -182,18 +204,18 @@ def make_workdir(workdir, python, seed):
     rates = model_rates(workdir, python)
     rng = np.random.default_rng(seed)
     kinds = {"clinical incidence": ("incidence", "incidence"), "clinical mortality": ("mortality", "mortality"),
-             "preclinical mortality": ("doa1", "doa"), "preclinical other mortality": ("doa2", "doa")}
+             "preclinical mortality": ("doa1", "doa"), "preclinical other mortality": ("doa2", "doa")}  # (counts, file)
     counts = {k: {} for k in ("incidence", "mortality", "doa1", "doa2")}
     for key, by_age in sorted(rates.items()):
         family, group = key.split("|")
-        kind, py = kinds[family]
+        kind, _ = kinds[family]
         for a in AGES[:-1]:
             r = by_age.get(a, 0.0)
             r = r if np.isfinite(r) and r > 0 else 0.0
             stages = SEER_STAGES[group]
             shares = [EARLY_IN_SITU_SHARE, 1 - EARLY_IN_SITU_SHARE] if len(stages) == 2 else [1.0]
             for st, share in zip(stages, shares):
-                counts[kind][(st, a)] = int(rng.poisson(r * share * PERSON_YEARS[py]))
+                counts[kind][(st, a)] = int(rng.poisson(r * share * PERSON_YEARS["incidence"]))
     write_data(os.path.join(workdir, "data"), counts)
     os.remove(os.path.join(workdir, "model_rates.json"))
     n_events = {k: sum(v.values()) for k, v in counts.items()}
@@ -203,7 +225,9 @@ This folder is a working copy made by `tools/synthetic_data.py`. Its `data/singl
 columns and labels of the SEER files `main.py` reads, but every count in them is SYNTHETIC: Poisson draws from the
 model at the generating parameters `output/urinary bladder mle generating.npy`, with seed {seed}.
 
-- Person-years per single year of age (synthetic): {PERSON_YEARS}.
+- Person-years per single year of age (synthetic): {PERSON_YEARS["incidence"]:,} in the rates file (years 2004 to 2021),
+  every family's denominator; the mortality file's and the pickle's own Population columns, {PERSON_YEARS["mortality"]:,}
+  and {PERSON_YEARS["doa"]:,}, are not used by main.py's default.
 - Early stage split between "In situ" and "Localized": {EARLY_IN_SITU_SHARE} / {1 - EARLY_IN_SITU_SHARE:g}.
 - Events drawn: {n_events}.
 - Results computed here describe the synthetic data only.
@@ -282,7 +306,7 @@ def collect(workdir, limis, n_events, seed, r, table):
         fh.write(f"""# SYNTHETIC results: not results of the paper
 
 Every file here was computed by `tools/synthetic_data.py --pipeline --limis {limis}` on SYNTHETIC data (seed {seed};
-person-years per single year of age {PERSON_YEARS}; events drawn {n_events}), generated from the model at the
+{PERSON_YEARS['incidence']:,} person-years per single year of age, every family's denominator; events drawn {n_events}), generated from the model at the
 committed MLE. They show that the pipeline runs and that the estimation recovers the generating parameters; they
 describe no real population.
 
