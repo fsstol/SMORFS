@@ -8,8 +8,6 @@ main README), which has the same files and formats.
 
 **Never commit SEER files.** `.gitignore` ignores `data/single-multiple/` and the case-level exports named below.
 
-> Placeholders to fill in are marked **[TO FILL: ...]**.
-
 ## Included: `US_life_table_2021.csv`
 
 The 2021 period life table of the US Social Security Administration (Table 4.C6, both sexes,
@@ -52,10 +50,10 @@ Columns, in this order:
 | `Crude Rate`, `Standard Error`, `Lower Confidence Interval`, `Upper Confidence Interval` | per 100,000, as SEER*Stat prints them ("~" for an undefined SE); not used by the model |
 | `Count`, `Population` | integers |
 
-- SEER*Stat database: **[TO FILL: database name and submission, e.g. "Incidence - SEER Research Data, ... Registries, Nov 20XX Sub"]**
-- Years of diagnosis: **[TO FILL: e.g. 2000 to 2021, as single years, plus the aggregate]**
-- Case selection: **[TO FILL: e.g. Site recode ICD-O-3/WHO 2008 = Urinary Bladder; malignant behaviour; first primary only?; age and race selections]**
-- Session settings: **[TO FILL: rate session, statistic = crude rates, standard errors and 95% CIs; population file used]**
+- SEER*Stat database: Incidence - SEER Research Data, 17 Registries, Nov 2023 Sub (2000-2021)"
+- Years of diagnosis: 2004 to 2021, as single years, plus the aggregate
+- Case selection: Site recode ICD-O-3/WHO 2008 = Urinary Bladder; malignant behavior
+- Session settings: rate session, statistic = crude rates, standard errors and 95% CIs; 2000 US Std Population (single ages to 84 - Census P25-1130)
 
 ### `mortality_urinary_bladder.csv`: a SEER*Stat session of deaths after diagnosis, exported as CSV
 
@@ -69,8 +67,9 @@ Columns:
 | `Crude Rate`, `Standard Error`, `Lower Confidence Interval`, `Upper Confidence Interval` | per 100,000; not used by the model |
 | `Count`, `Population` | integers |
 
-- SEER*Stat database and session type: **[TO FILL: e.g. incidence-based mortality session; database and submission]**
-- Years and selections: **[TO FILL: years of death / follow-up; case selection as for the rates file]**
+- SEER*Stat database: Incidence-Based Mortality - SEER Research Data, 17 Registries, Nov 2023 Sub (2000-2021)"
+- Case selection: Site recode ICD-O-3/WHO 2008 = Urinary Bladder; malignant behavior
+- Session settings: rate session, statistic = crude rates, standard errors and 95% CIs; 2000 US Std Population (single ages to 84 - Census P25-1130)
 
 ### `doa_urinary bladder.pkl`: built by `main.py` from a case listing
 
@@ -96,8 +95,10 @@ It is built by `main.py`'s `main_pickle()` and `main_doa()`, which are not calle
 3. **The deaths.** `main_doa()` counts, by outcome, stage and age, the deaths with survival of at most 2 months
    (`parameters.months_cutoff`). It excludes cases with unknown survival or "Unknown/unstaged" stage.
 
-- Case listing: **[TO FILL: database, years of diagnosis, case selection, and the SEER*Stat case-listing session settings]**
-- Populations: **[TO FILL: population database, e.g. the SEER population file of the same registries; years; selections]**
+- SEER*Stat database: Incidence - SEER Research Data, 17 Registries, Nov 2023 Sub (2000-2021)"
+- Years of diagnosis: 2004 to 2021, as single years
+- Case selection: Site recode ICD-O-3/WHO 2008 = Urinary Bladder; malignant behavior; known age
+- Session settings: case listing session
 
 ## Rebuilding the targets and checking them
 
