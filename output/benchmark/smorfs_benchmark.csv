@@ -1,0 +1,10 @@
+quantity,value,note
+max_rel_error_vs_reference_T3b,7.87304e-06,worst preclin_mort_medium at 35
+max_rel_error_vs_reference_T3b_grid_path,0.0105155,"v2 grid summation, for comparison; worst clin_mort_early at 37"
+regenerated_reference_vs_committed_max_rel_diff,1.12884e-13,output/benchmark/reference_targets.csv vs verification/reference_targets.csv
+seconds_objective_table2_rounded,0.0012776,"median of 10 (min 0.0012, max 0.0013)"
+seconds_objective_and_gradient_table2_rounded,0.00252831,"median of 10 (min 0.0024, max 0.0026)"
+seconds_objective_gradient_hessian_table2_rounded,0.00910948,"median of 10 (min 0.0087, max 0.0102)"
+seconds_objective_mle,0.00123329,"median of 10 (min 0.0012, max 0.0013)"
+seconds_objective_and_gradient_mle,0.0024831,"median of 10 (min 0.0025, max 0.0026)"
+seconds_objective_gradient_hessian_mle,0.00893602,"median of 10 (min 0.0087, max 0.0090)"

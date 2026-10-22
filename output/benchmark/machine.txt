@@ -1,0 +1,17 @@
+cpu: Apple M4 Max
+cores: 16 (12 performance + 4 efficiency)
+memory_GB: 128
+os: macOS 26.6.2 (25G83), macOS-26.6.2-arm64-arm-64bit
+power: Now drawing from 'AC Power'
+python: 3.12.15 (conda env smorfs)
+numpy: 2.4.4
+scipy: 1.17.1
+pandas: 3.0.6
+compiler: Apple clang version 21.0.0 (clang-2100.3.34.2)
+R: Rscript (R) version 4.5.3 (2026-03-11)
+git_commit: cbd66dc
+load_average_start: 2.73 3.86 4.05
+R_script_wall_seconds: 1.4
+load_average_after_R: 2.91 3.88 4.05
+load_average_after_R_repeats: 2.69 3.80 4.02
+load_average_after_timings: 2.69 3.80 4.02

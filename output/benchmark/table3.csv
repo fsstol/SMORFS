@@ -1,0 +1,6 @@
+method,max_rel_error,seconds,derivatives,seconds_with_gradient,seconds_with_hessian
+"Reference (quadrature + matrix exponential, h = 1/256 yr)",5.90227e-06,0.028,finite differences only,,
+"Cohort approximation, 1-month cycle",0.0334818,0.023,finite differences only,,
+"Cohort approximation, 1-year cycle",0.415295,0.001,finite differences only,,
+"Microsimulation, N = 2e+06",8.1083,1.054,none (stochastic objective),,
+SMORFS (frequency domain),7.87304e-06,0.0012776,"exact, analytic",0.00252831,0.00910948
