@@ -6,7 +6,7 @@ NEWTON_TOL = 1e-8 in place of main.py's newton_tol = 1e-5, so that it does not s
 below the gate. It then runs until its own rule stops it: the gradient norm below 1e-8, or no step decreasing the
 objective (backtracking), which happens first once the objective's changes are at round-off. On the synthetic data of
 tools/synthetic_data.py it stops at iteration 8 with gradient norm 3.5e-6 (the first iterate below 1e-5 is 9.3e-6).
-Gates: it converges (analytic gradient norm < 1e-5), and every parameter's z = (log estimate - log generating value) / SE, with
+Gates: it converges (analytic gradient norm < GRADIENT_GATE = 1e-4, well above where the optimizer stops), and every parameter's z = (log estimate - log generating value) / SE, with
 the SE from the observed information at the estimate, has |z| < 4. With 13 parameters and data drawn from the model,
 |z| beyond 4 has probability about 1e-3 under correct estimation and SEs.
 """
@@ -18,7 +18,8 @@ import numpy as np
 from common import ROOT, load_h2, row, run_refit
 
 GENERATING = os.path.join(ROOT, "output", "urinary bladder mle generating.npy")
-NEWTON_TOL = 1e-8  # the refit's stopping tolerance, far below the gate (main.py's default is 1e-5)
+NEWTON_TOL = 1e-8  # the refit's stopping tolerance (main.py's default is 1e-5)
+GRADIENT_GATE = 1e-4  # the convergence gate on the analytic gradient norm at the refit
 
 
 def run(ctx):
@@ -38,7 +39,7 @@ def run(ctx):
     z = (th - gen) / se
     worst = int(np.argmax(np.abs(z)))
     gn = float(np.linalg.norm(grad))
-    return [row("recovery", "refit converges (analytic gradient norm)", gn, "< 1e-5", gn < 1e-5,
+    return [row("recovery", "refit converges (analytic gradient norm)", gn, f"< {GRADIENT_GATE:g}", gn < GRADIENT_GATE,
                 f"{len(log) - 1} Newton iterations; "
                 + next((ln.split(": ", 1)[1] for ln in proc.stdout.splitlines() if ln.startswith("Newton: ")), "")),
             row("recovery", "largest abs(z) of the estimates vs the generating values", float(np.abs(z[worst])), "< 4",

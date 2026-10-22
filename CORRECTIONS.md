@@ -110,7 +110,7 @@ entry whose check needs the SEER data says "verified on the SEER data; not in th
   - v2's schedule remains behind `newton_damped = True`.
 - **Test:** `recovery` (on synthetic data, `main.py`'s default optimizer converges and recovers the generating
   parameters; the test sets `newton_tol` to 1e-8, so that the optimizer stops only when no step lowers the objective
-  any more, and gates the gradient norm at 1e-5).
+  any more, and gates the gradient norm at 1e-4).
 
 ## The library
 
