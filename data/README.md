@@ -29,12 +29,15 @@ https://www.ssa.gov/oact/STATS/table4c6.html), public data. Two columns:
 | `doa_urinary bladder.pkl` (the name contains a space) | counts and populations of deaths within 2 months of diagnosis, from this cancer (outcome 1) or other causes (outcome 2) | preclinical mortality and preclinical other-cause mortality |
 
 For each family, stage group and single year of age 35 to 80 (552 targets in all), `main.py` takes the target as
-count / population, with standard error sqrt(count) / population. Its functions are `get_target_incidence`,
+count / person-years, with standard error sqrt(count) / person-years. Its functions are `get_target_incidence`,
 `get_target_mortality` and `get_target_doa`, and `verification/h2.py`'s `exact_targets` calls them.
 - **Counts** are summed over the SEER stages of a group: Early = "In situ" + "Localized", Medium = "Regional",
   Late = "Distant".
-- **The population** is the group's first stage's. In SEER*Stat rate sessions every stage row carries the same
-  population.
+- **The person-years** are the same for all four families: SEER 17's for the years of diagnosis 2004 to 2021, by
+  single year of age, summed from the rates file's single-year rows (`main.seer17_person_years`). In SEER*Stat rate
+  sessions every stage row of a year and age carries the same population, so one stage's rows are used. The
+  mortality file's and the pickle's own `Population` columns are not used (`main.corrected_denominators = True`, the
+  default since v1.0.1, `CORRECTIONS.md` entry 16; `False` gives the targets of v1.0.0 and of the first submission).
 - **Rows that are dropped:** stage "Blank(s)" (or missing) and "Unknown/unstaged", the year-of-diagnosis aggregate
   "2000-2021", and the ages outside 35 to 80.
 
@@ -45,15 +48,17 @@ Columns, in this order:
 | Column | Values |
 |---|---|
 | `Combined Summary Stage (2004+)` | "In situ", "Localized", "Regional", "Distant", "Unknown/unstaged", "Blank(s)" |
-| `Year of diagnosis` | single years, and the aggregate "2000-2021" (which `main.py` drops) |
+| `Year of diagnosis` | single years 2000 to 2021, and the aggregate "2000-2021" (which `main.py` drops) |
 | `Age recode with single ages and 85+` | "00 years" to "84 years", "85+ years" |
 | `Crude Rate`, `Standard Error`, `Lower Confidence Interval`, `Upper Confidence Interval` | per 100,000, as SEER*Stat prints them ("~" for an undefined SE); not used by the model |
 | `Count`, `Population` | integers |
 
-- SEER*Stat database: Incidence - SEER Research Data, 17 Registries, Nov 2023 Sub (2000-2021)"
-- Years of diagnosis: 2004 to 2021, as single years, plus the aggregate
+- SEER*Stat database: Incidence - SEER Research Data, 17 Registries, Nov 2023 Sub (2000-2021)
+- Years of diagnosis: 2004 to 2021. The file lists every year of the database, 2000 to 2021, but the rows of 2000 to
+  2003 have count and population 0, so the incidence targets' cases and person-years are those of 2004 to 2021
+  (`main.py` keeps all single years and drops the aggregate)
 - Case selection: Site recode ICD-O-3/WHO 2008 = Urinary Bladder; malignant behavior
-- Session settings: rate session, statistic = crude rates, standard errors and 95% CIs; 2000 US Std Population (single ages to 84 - Census P25-1130)
+- Session settings: rate session, statistic = crude rates, standard errors and 95% CIs
 
 ### `mortality_urinary_bladder.csv`: a SEER*Stat session of deaths after diagnosis, exported as CSV
 
@@ -67,9 +72,14 @@ Columns:
 | `Crude Rate`, `Standard Error`, `Lower Confidence Interval`, `Upper Confidence Interval` | per 100,000; not used by the model |
 | `Count`, `Population` | integers |
 
-- SEER*Stat database: Incidence-Based Mortality - SEER Research Data, 17 Registries, Nov 2023 Sub (2000-2021)"
+- SEER*Stat database: Incidence-Based Mortality - SEER Research Data, 17 Registries, Nov 2023 Sub (2000-2021)
+- Years: the file has no year column. Its deaths and person-years are those of the years of death 2000 to 2021, the
+  database's whole span, for cases diagnosed from 2000. "Combined Summary Stage (2004+)" is defined only for cases
+  diagnosed from 2004, so the deaths of cases diagnosed in 2000 to 2003 have stage "Blank(s)"; `main.py` drops them,
+  and they enter no target. The deaths that remain are of cases diagnosed from 2004, and `main.py` divides them by
+  the rates file's person-years of 2004 to 2021, not by this file's population of 2000 to 2021
 - Case selection: Site recode ICD-O-3/WHO 2008 = Urinary Bladder; malignant behavior
-- Session settings: rate session, statistic = crude rates, standard errors and 95% CIs; 2000 US Std Population (single ages to 84 - Census P25-1130)
+- Session settings: rate session, statistic = crude rates, standard errors and 95% CIs
 
 ### `doa_urinary bladder.pkl`: built by `main.py` from a case listing
 
@@ -91,12 +101,19 @@ It is built by `main.py`'s `main_pickle()` and `main_doa()`, which are not calle
    - `Age recode with single ages and 85+`.
 2. **The populations.** `single-multiple/populations.csv`, with columns `Year`,
    `Age recode with single ages and 90+` and `Count`. `main_doa()` keeps the years 2004 to 2021, and groups ages 85 to
-   89 and 90+ as "85+ years".
+   89 and 90+ as "85+ years". These populations go into the pickle's `Population` column, which `main.py`'s targets
+   no longer use: since v1.0.1 the deaths at diagnosis, which are SEER 17's cases, are divided by SEER 17's person-years
+   of 2004 to 2021 from the rates file, like every other family (`CORRECTIONS.md` entry 16).
+   - SEER*Stat database, as reported by the author who made the file: Populations - Total U.S. (1990-2023)
+     <Katrina/Rita Adjustment>. The populations in the pickle do not match the total US, however: by single year of
+     age, they match the SEER 22 area (SEER 17 plus Idaho, Illinois, Massachusetts, New York and Texas) for 2004 to
+     2021, against the Census Bureau's population estimates. Either way they are not SEER 17's, which is why they
+     are no longer used.
 3. **The deaths.** `main_doa()` counts, by outcome, stage and age, the deaths with survival of at most 2 months
    (`parameters.months_cutoff`). It excludes cases with unknown survival or "Unknown/unstaged" stage.
 
-- SEER*Stat database: Incidence - SEER Research Data, 17 Registries, Nov 2023 Sub (2000-2021)"
-- Years of diagnosis: 2004 to 2021, as single years
+- SEER*Stat database: Incidence - SEER Research Data, 17 Registries, Nov 2023 Sub (2000-2021)
+- Years of diagnosis: 2004 to 2021; `main_doa()` keeps the populations of the same years
 - Case selection: Site recode ICD-O-3/WHO 2008 = Urinary Bladder; malignant behavior; known age
 - Session settings: case listing session
 

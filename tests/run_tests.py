@@ -4,7 +4,7 @@
     python tests/run_tests.py                  # every test below, on the data in data/
     python tests/run_tests.py general steps    # a subset: general steps acceleration risks quadws limis othercause
                                                # weibull T2 T3 T3b T3c cache threads emptygrid quadrature errorbars
-                                               # runbox recovery
+                                               # runbox recovery denominators
     python tests/run_tests.py --rscript        # T3 also regenerates the R reference in its sandbox
 
 Prerequisites: bash compile.sh. The tests that build the bladder model need the three data files in data/ (SEER data,
@@ -26,7 +26,8 @@ TESTS = {"general": "test_library_general", "steps": "test_steps", "acceleration
          "othercause": "test_othercause", "weibull": "test_weibull", "T2": "test_t2_derivatives",
          "T3": "test_t3_accuracy", "T3b": "test_t3b_accuracy", "T3c": "test_t3c_weighting", "cache": "test_cache",
          "threads": "test_threads", "emptygrid": "test_empty_grid", "quadrature": "test_quadrature",
-         "errorbars": "test_errorbars", "runbox": "test_limis_runbox", "recovery": "test_synthetic_recovery"}
+         "errorbars": "test_errorbars", "runbox": "test_limis_runbox", "recovery": "test_synthetic_recovery",
+         "denominators": "test_denominators"}
 SLOW = []  # run only with --slow, or when named
 
 
@@ -36,10 +37,10 @@ class Context:
         self.rscript = rscript
         self._runs = {}
 
-    def main_run(self, hot_start=True):
-        if hot_start not in self._runs:
-            self._runs[hot_start] = common.run_main(hot_start=hot_start)
-        return self._runs[hot_start]
+    def main_run(self, hot_start=True, corrected=True):
+        if (hot_start, corrected) not in self._runs:
+            self._runs[(hot_start, corrected)] = common.run_main(hot_start=hot_start, corrected=corrected)
+        return self._runs[(hot_start, corrected)]
 
     def cleanup(self):
         for d, _, _ in self._runs.values():

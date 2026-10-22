@@ -1,4 +1,4 @@
-"""The library on model structures other than the bladder model's (branch speedup, SPEEDUP.md).
+"""The library on model structures other than the bladder model's (CORRECTIONS.md, entries 10, 11 and 14).
 
 G1: a cycle through a quadrature state with two risks. A -> B Weibull, A -> D exponential, B -> A and B -> C
     exponential; C and D terminal. Gradients of every arrival and prevalence value against central differences, and
@@ -10,12 +10,12 @@ G2: one risk object on two transitions out of a state (B -> C and B -> D share a
 Structure errors: a second transition between the same two states, and a transition to a state not in the model,
     must raise ValueError.
 G4: a Weibull onset into a random exponential graph of 16 states (fixed seed) with several cycles, so the linear systems
-    have components of several states (entry 26): derivative checks as G1, and values against the convolution of the onset
+    have components of several states: derivative checks as G1, and values against the convolution of the onset
     density with the matrix exponential.
 G3: a smooth Weibull onset H -> A into an all-exponential cycle (A <-> B, both exiting to C); values against the
     convolution of the onset density with the matrix exponential.
 Value errors are relative to each quantity's largest value over the times. They leave out the initial state's prevalence: it jumps from 0 to 1 at t = 0, where the Fourier series
-converges slowly (Gibbs ringing, CHANGES.md entry 15); with an exponential exit from the initial state every state
+converges slowly (Gibbs ringing); with an exponential exit from the initial state every state
 downstream inherits a kink at 0 and the error is about 1e-1 at t = 1 with 120 terms. That is the inversion's limit,
 not the structure's, so each model here starts with a smooth Weibull onset.
 """

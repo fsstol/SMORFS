@@ -143,6 +143,7 @@ def calculate_new_limit(fixed, dependent, limit):
     '''
     mask = (fixed >=limit[0]) & (fixed <= limit[1])
     window = dependent[mask]
+    window = window[~np.isnan(window)]  # targets not drawn (SingularCancer.plot_suppress_events) are NaN
     if len(window) > 0:
         low, high = window.min(), window.max()
     else:

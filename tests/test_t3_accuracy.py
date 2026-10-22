@@ -3,7 +3,7 @@
 The benchmark writes into the repository root, so it runs in a sandbox copy. By default it uses the
 committed verification/reference_targets.csv. With --rscript, bladder_reference_check.R first
 regenerates reference_targets.csv in the sandbox, and the benchmark uses that copy instead.
-No gate before task 8 (cumulative path <= 2e-4). The values in CLAUDE.md are given in the notes.
+No gate here; T3b gates the cumulative path (<= 2e-4). The code review's values are given in the notes.
 """
 import os
 import subprocess
@@ -38,7 +38,7 @@ def run(ctx):
         return rows + [row("T3", "smorfs_benchmark.py", "failed", "runs", False, proc.stderr[-300:])]
     res = pd.read_csv(os.path.join(d, "smorfs_benchmark.csv")).set_index("quantity")["value"]
     for q, expected in EXPECTED.items():
-        rows.append(row("T3", q, float(res[q]), "info", None, f"CLAUDE.md: {expected:.3g}"))
+        rows.append(row("T3", q, float(res[q]), "info", None, f"code review: {expected:.3g}"))
     for q in ["seconds_objective", "seconds_objective_and_gradient", "seconds_objective_gradient_hessian"]:
         rows.append(row("T3", q, float(res[q]), "info", None))
     return rows

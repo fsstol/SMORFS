@@ -4,13 +4,14 @@
 
 1. Tests that need no data, run in this repository: general, steps, acceleration, risks, quadws, limis.
 2. Tests that build the bladder model, run on SYNTHETIC data (tools/synthetic_data.py) in a temporary synthetic working
-   copy: othercause, weibull, T2, T3c, cache, threads, emptygrid, quadrature, errorbars, runbox, recovery; and, when
+   copy: othercause, weibull, T2, T3c, cache, threads, emptygrid, quadrature, errorbars, runbox, recovery,
+   denominators; and, when
    Rscript is available, T3 and T3b, after the R reference (verification/bladder_reference_check.R) is regenerated
    there. Their gates are internal (derivatives against finite differences, caches, quadrature, the R reference at
    given parameters, parameter recovery), so they hold on synthetic data.
 Tests of the paper's own results need the SEER data and references computed from it, and are not part of this
-repository: the targets against the published tables (T1), the hot start's objective, the MLE against its reference
-(T4, T4b, T4c, T4d), the LIMIS summary table against the reference SEs (summary), and the golden outputs (golden).
+repository: the targets against the published tables (T1), the hot start's objective, the MLE against its reference, the LIMIS
+summary table against the reference SEs, and the golden outputs.
 """
 import os
 import shutil
@@ -21,7 +22,7 @@ import tempfile
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 NO_DATA = ["general", "steps", "acceleration", "risks", "quadws", "limis"]
 SYNTHETIC = ["othercause", "weibull", "T2", "T3c", "cache", "threads", "emptygrid", "quadrature", "errorbars", "runbox",
-             "recovery"]
+             "recovery", "denominators"]
 WITH_R = ["T3", "T3b"]
 
 

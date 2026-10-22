@@ -1,5 +1,5 @@
 """The weights of the series acceleration (Cohen, Rodriguez Villegas and Zagier's algorithm 1) against exact values
-(branch speedup, entries 29 and 30).
+(CORRECTIONS.md, entry 12).
 
 With p_j the coefficients of T_n(1 + 2x), positive integers (p_0 = 1, p_{j+1} = p_j 2 (n+j)(n-j) / ((2j+1)(j+1))), the
 weights are w_k = (p_{k+1} + ... + p_n) / (p_0 + ... + p_n), k = 0, ..., n-1; exact as fractions. The smallest weight,

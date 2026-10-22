@@ -70,8 +70,9 @@ The results go to `output/synthetic/` (git-ignored). Every name starts with "SYN
   `steps`, `acceleration`, `risks` (Gompertz, log-normal and log-logistic risks against 50-digit references), `quadws`
   (an AddressSanitizer build) and `limis` (LIMIS on a toy target with a known posterior).
 - **On synthetic data, in a temporary working copy:** `othercause`, `weibull`, `T2` (gradients and Hessians against
-  finite differences), `T3c`, `cache`, `threads`, `emptygrid`, `quadrature`, `errorbars`, `runbox` and `recovery` (the MLE
-  recovers the generating parameters). With R: `T3` and `T3b` (SMORFS against the independent R reference).
+  finite differences), `T3c`, `cache`, `threads`, `emptygrid`, `quadrature`, `errorbars`, `runbox`, `recovery` (the MLE
+  recovers the generating parameters) and `denominators` (every target's person-years are the rates file's,
+  `CORRECTIONS.md` entry 16). With R: `T3` and `T3b` (SMORFS against the independent R reference).
 
 The tests of the paper's own numbers need the SEER data and references computed from it, and are not included.
 
@@ -82,18 +83,25 @@ With the three SEER files in `data/single-multiple/` (`data/README.md`), run fro
 | Result | Command | Time (Apple M4 Max) |
 |---|---|---|
 | Table 2, MLE column | `python tests/table2_mle.py` | 3 s |
-| LIMIS runs | `cd src && python limis_runs.py --seeds 0-19 --workers 20 --min-half-width 0.3 --limis-dir ../output/IMIS2_final` | 7 min |
-| Table 2, LIMIS column; Figures 3 to 7 | `python tests/limis_figures.py --limis-dir output/IMIS2_final --min-half-width 0.3 --dest output/final`, then the same with `--steps posterior --axes-to-bounds` | 3 min |
+| LIMIS runs | `cd src && python limis_runs.py --seeds 0-19 --workers 20 --min-half-width 0.3 --limis-dir ../output/IMIS2_corrected` | 7 min |
+| Table 2, LIMIS column; Figures 3 to 7 | `python tests/limis_figures.py --limis-dir output/IMIS2_corrected --min-half-width 0.3 --dest output/final`, then the same with `--steps posterior --axes-to-bounds` | 3 min |
 | Table 3 | `python tests/benchmark.py` (needs `Rscript`) | 20 s |
 | Figure S1 | `cd verification && Rscript bladder_reference_check.R && cd ..`, then `python tests/inversion_convergence.py` | 3 s |
 
 - **Table 2.** `tests/table2_mle.py` rebuilds the 552 targets with `main.py`'s functions and refits the model. It then
   compares the MLE column, at four decimal places, with `output/final/urinary bladder CIs.csv`, and exits with
   status 1 if any cell differs.
+- **The targets** (`data/README.md`). Every target is count / person-years, with SE √count / person-years. The
+  person-years of all four families are SEER 17's for 2004 to 2021, by single year of age, from the rates file
+  (`main.corrected_denominators = True`, the default since v1.0.1; `CORRECTIONS.md` entry 16).
 - **LIMIS.** The prior is uniform on the log scale, centred at `output/urinary bladder mle.npy`, with half-width
   max(0.3, 4 SE). There are 20 runs with seeds 0 to 19, each with 10,000 initial samples and 100 steps of 1,000.
 - **Figures.** The second `limis_figures.py` command draws Figure 6 with its x-axes at the prior bounds. Figures 3 to 5
   show SEER rates, so only the outputs of these commands contain them; keep those out of public repositories.
+  In Figures 3 to 5, targets based on 1 to 4 events are not drawn, neither point nor error bar, because SEER's
+  data-use agreement requires statistics based on counts of 1 to 4 to be suppressed in publications
+  (`SingularCancer.plot_suppress_events`; `None` draws every target). Targets with no events are drawn at 0. This
+  affects the figures only, the synthetic ones included: the objective and the fit use every target.
 - **The correlogram's font.** `tests/limis_figures.py` puts DejaVu Sans first in seaborn's font list. With seaborn's
   default (Arial first), macOS renders the subscripts of the labels (U₁→U₂) as boxes.
 

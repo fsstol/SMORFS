@@ -15,13 +15,48 @@ pd.options.display.max_rows = 20
 # main_rates writes the target table ../output/<cancer>_rates.csv; parallel runs (limis_runs.py) set this False in all
 # but one process, because concurrent writes of the same file can corrupt it even when the content is identical
 write_rates_table = True
-# LIMIS prior half-width floor on the log scale: None gives limis_n_se SE throughout (task 9); 0.3, v2's half-width,
-# gives max(0.3, limis_n_se SE) per parameter (task 9b, the wide prior; limis_runs.py --min-half-width)
+# LIMIS prior half-width floor on the log scale: None gives limis_n_se SE throughout (the +-4 SE prior); 0.3, v2's half-width,
+# gives max(0.3, limis_n_se SE) per parameter (the wide prior, the paper's; limis_runs.py --min-half-width)
 limis_min_half_width = None
 # LIMIS prior: fixed natural-scale bounds for chosen parameters, {name as in the bounds table: (lower, upper)}, e.g.
-# {"Incidence_1": (7.0, 8.0), "Incidence_2": (130.0, 140.0)} for the Weibull shape and scale (task 9c;
+# {"Incidence_1": (7.0, 8.0), "Incidence_2": (130.0, 140.0)} for the Weibull shape and scale (
 # limis_runs.py --fixed-bounds); the other parameters keep the rule above. None (the default): none fixed
 limis_fixed_bounds = None
+# Denominators of the clinical mortality and deaths-at-diagnosis targets (CORRECTIONS.md, entry 16). True (the default
+# since v1.0.1, the paper's targets): both are SEER 17's person-years of 2004 to 2021 by single year of age, from the rates
+# file, the incidence targets' own denominators. False: the original analysis's targets, each file's own population: the
+# incidence-based mortality file's person-years of 2000 to 2021, and the pickle's of 2004 to 2021, which equal the
+# SEER 22 area's (SEER 17 plus Idaho, Illinois, Massachusetts, New York and Texas), about 1.8 times SEER 17's
+corrected_denominators = True
+corrected_years = (2004, 2021)
+
+
+def seer17_person_years(df_rates: pd.DataFrame) -> pd.Series:
+    """SEER 17's person-years of corrected_years by single year of age (the rates file's age labels), from the rates
+    file's single-year rows. In a rate session every stage row of a year and age carries the same population, so each
+    (year, age) is counted once."""
+    years = pd.to_numeric(df_rates[diag_col], errors="coerce")
+    rows = df_rates.loc[years.between(*corrected_years)]
+    pops = rows.groupby([diag_col, age_col_rates])["Population"].agg(["first", "nunique"])
+    if (pops["nunique"] != 1).any():
+        raise ValueError("rates file: the stage rows of a year and age carry different populations")
+    if pops.index.get_level_values(0).nunique() != corrected_years[1] - corrected_years[0] + 1:
+        raise ValueError(f"rates file: not every year of {corrected_years} is present")
+    return pops["first"].groupby(level=age_col_rates).sum()
+
+
+def apply_corrected_denominators(df_rates, df_mortality_c, df_doa_c):
+    """With corrected_denominators, replace the Population columns of the mortality rows and the deaths-at-diagnosis
+    rows (modified in place) with seer17_person_years(df_rates), matched on the age label. The counts, and so the
+    targets' Poisson SE sqrt(count) / population, are otherwise computed as before."""
+    if not corrected_denominators:
+        return
+    py = seer17_person_years(df_rates)
+    for df, age_col in [(df_mortality_c, "Age at death with single ages and 85+"), (df_doa_c, age_col_rates)]:
+        new = df[age_col].map(py)
+        if new.isna().any():
+            raise ValueError(f"no SEER 17 person-years for ages {sorted(df.loc[new.isna(), age_col].unique())}")
+        df["Population"] = new.astype(np.int64)
 
 
 def main_pickle():
@@ -205,9 +240,10 @@ def main_rates(arguments):
     np.random.seed(seed)
 
     df_mortality_c = pd.read_csv(f"../data/single-multiple/mortality_{cancer.replace(' ', '_').lower()}.csv")
-    df_mortality_c = df_mortality_c.loc[df_mortality_c["SEER cause-specific death classification"] == "Dead (attributable to this cancer dx)"]
+    df_mortality_c = df_mortality_c.loc[df_mortality_c["SEER cause-specific death classification"] == "Dead (attributable to this cancer dx)"].copy()
     df_doa_c: pd.DataFrame = pd.read_pickle(f"../data/single-multiple/doa_{cancer.lower()}.pkl")
     df_doa_c.reset_index(drop=False, inplace=True)
+    apply_corrected_denominators(df_single_c, df_mortality_c, df_doa_c)
 
     filename_c = f"../output/{cancer.lower()} mle.npy"
     filename_hot_start_c = f"../output/{cancer.lower()}.npy"  # Table 2 estimate; never overwritten

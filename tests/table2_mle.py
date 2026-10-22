@@ -1,9 +1,9 @@
-"""Table 2's MLE column from the data (task 11; the deposit README).
+"""Table 2's MLE column from the data (README).
 
     python tests/table2_mle.py      # about 3 s on an M4 Max
 
-main.py's own fit, in a sandbox (common.run_refit, as T4d): the targets are rebuilt from the four files in data/, and
-main.py's default optimizer (saddle-free Newton with backtracking, entry 44) runs from the v2 estimate
+main.py's own fit, in a sandbox (common.run_refit): the targets are rebuilt from the four files in data/, and
+main.py's default optimizer (saddle-free Newton with backtracking, CORRECTIONS.md entry 9) runs from the v2 estimate
 output/urinary bladder.npy until the gradient norm is below newton_tol = 1e-5 (at most 100 iterations). At the
 estimate the 95% intervals are exp(theta +- 1.96 SE), with the SEs from the observed information (model.limis_bounds),
 in fixed point with four decimal places: the MLE column main_rates writes to CIs.csv.

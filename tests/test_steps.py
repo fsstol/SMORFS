@@ -1,4 +1,4 @@
-"""The optimizer and sampler steps of the C++ library against v2's NumPy formulas (branch speedup, entry 16).
+"""The optimizer and sampler steps of the C++ library against v2's NumPy formulas (the performance work).
 
 100 random symmetric 13 x 13 matrices with eigenvalues of magnitude 1 to 1e4 and either sign, a quarter of them with
 two zero eigenvalues: saddle-free and plain Newton steps (v2: lstsq of P |D| P^T and of H), the Newton flow, the
