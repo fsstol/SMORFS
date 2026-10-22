@@ -27,6 +27,11 @@ class SingularCancer(SemiMarkov):
     # True: IMIS2 also draws the histograms and the correlogram with axes set to the prior bounds (exp(center +-
     # half_width)) instead of matplotlib's autoscale of the draws, saved as ..._hist_bounds_N, ..._corr_bounds_N
     limis_axes_to_bounds = False
+    # figures only: targets based on this many events (inclusive range; events = (target / SE)^2 = the count) are not
+    # drawn, neither point nor error bar, as SEER's data-use agreement requires for statistics based on counts of 1 to
+    # 4 (README). Targets with no events are drawn as before. The objective, the targets and every model curve and
+    # band are unchanged. None draws every target
+    plot_suppress_events = (1, 4)
 
     def __init__(self, name: str, shape, scale):
         super().__init__(name)
@@ -139,6 +144,20 @@ class SingularCancer(SemiMarkov):
         sigmas = 1.96 * np.array(sigmas)
         return np.array([sigmas, sigmas])
 
+    def suppress_low_counts(self, target_inc, ages, mus, sigmas):
+        """mus (n) and error-bar lengths sigmas (2 x n) for drawing, with NaN, which matplotlib leaves undrawn, at the
+        targets whose event count is in plot_suppress_events."""
+        mus, sigmas = np.array(mus, dtype=float), np.array(sigmas, dtype=float)
+        if self.plot_suppress_events is not None:
+            lo, hi = self.plot_suppress_events
+            for i, a in enumerate(ages):
+                mu, se = target_inc[a]
+                events = int(round((mu / se) ** 2)) if 0.0 < se < 1e19 else 0
+                if lo <= events <= hi:
+                    mus[i] = np.nan
+                    sigmas[:, i] = np.nan
+        return mus, sigmas
+
     def plot_target(self, ax_idx, target_type, stage, target_inc, target_inc_ages, y_vals):
         fig = plt.gcf()
         ax = fig.get_axes()[ax_idx]
@@ -148,6 +167,7 @@ class SingularCancer(SemiMarkov):
         sigmas = [target_inc[a][1] for a in target_inc_ages[:-1]]
         sigmas = np.array([1e5 * s if s < 1e9 else 0.0 for s in sigmas])
         sigmas = self.calc_CIs(mus, sigmas)
+        mus, sigmas = self.suppress_low_counts(target_inc, target_inc_ages[:-1], mus, sigmas)
 
         x = [(age_groups[a][0]+age_groups[a][1])/2 for a in target_inc_ages[:-1]]
         plt.plot(x, 1e5 * y_vals, self.stage_colors[stage], linewidth=1.0, label="Model - " + stage)
@@ -527,6 +547,7 @@ class SingularCancer(SemiMarkov):
                 sigmas = [target_inc[a][1] for a in target_inc_ages[:-1]]
                 sigmas = [1e5 * s if s < 1e9 else 0.0 for s in sigmas]
                 sigmas = self.calc_CIs(mus, sigmas)
+                mus, sigmas = self.suppress_low_counts(target_inc, target_inc_ages[:-1], mus, sigmas)
 
                 x = [(age_groups[a][0]+age_groups[a][1])/2 for a in target_inc_ages[:-1]]
                 plt.fill_between(x, y_vals1, y_vals2, label="Model - " + stage, color=self.stage_colors[stage], alpha=0.5)
@@ -564,6 +585,7 @@ class SingularCancer(SemiMarkov):
                 sigmas = [target_inc[a][1] for a in target_inc_ages[:-1]]
                 sigmas = [1e5 * s if s < 1e9 else 0.0 for s in sigmas]
                 sigmas = self.calc_CIs(y, sigmas)  # 95% interval, as in the other figures (v2: +-1 SE)
+                y, sigmas = self.suppress_low_counts(target_inc, target_inc_ages[:-1], y, sigmas)
                 x = [(age_groups[a][0]+age_groups[a][1])/2 for a in target_inc_ages[:-1]]
                 plt.fill_between(x, y_vals1, y_vals2, label="Prior Coverage", color=self.stage_colors[stage], alpha=0.5)
                 plt.errorbar(x, y, sigmas, capsize=3, fmt=".--", color=self.stage_colors[stage], linewidth=1.0, markersize=3.0, ecolor=self.stage_colors[stage], label="Target")

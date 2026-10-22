@@ -98,6 +98,10 @@ With the three SEER files in `data/single-multiple/` (`data/README.md`), run fro
   max(0.3, 4 SE). There are 20 runs with seeds 0 to 19, each with 10,000 initial samples and 100 steps of 1,000.
 - **Figures.** The second `limis_figures.py` command draws Figure 6 with its x-axes at the prior bounds. Figures 3 to 5
   show SEER rates, so only the outputs of these commands contain them; keep those out of public repositories.
+  In Figures 3 to 5, targets based on 1 to 4 events are not drawn, neither point nor error bar, because SEER's
+  data-use agreement requires statistics based on counts of 1 to 4 to be suppressed in publications
+  (`SingularCancer.plot_suppress_events`; `None` draws every target). Targets with no events are drawn at 0. This
+  affects the figures only, the synthetic ones included: the objective and the fit use every target.
 - **The correlogram's font.** `tests/limis_figures.py` puts DejaVu Sans first in seaborn's font list. With seaborn's
   default (Arial first), macOS renders the subscripts of the labels (U₁→U₂) as boxes.
 
