@@ -1,4 +1,4 @@
-"""Diagnostics of the task 9 LIMIS runs (src/limis_runs.py), from the saved files only.
+"""Diagnostics of LIMIS runs (src/limis_runs.py), from the saved files only.
 
     python tests/limis_diagnostics.py [--samples DIR] [--out DIR]
         defaults: output/IMIS2/samples and output/IMIS2/diagnostics
@@ -13,10 +13,9 @@ B and C are in); the recomputed one is used. Reported:
   - agreement across runs, per parameter: the SD of the per-run posterior means divided by the pooled posterior SD,
     and the largest |run median - pooled median| / pooled SD
   - posterior mass near each bound, per parameter and side: the pooled weight within 0.5 SE of the bound
-    (with the 4 SE box of task 9, beyond 3.5 SE from the centre). For a normal posterior with SD = SE and that box
-    it is 2.3e-4; a value above 1e-2 is flagged, and that bound should be widened and the runs repeated (CLAUDE.md,
-    task 9).
-The SEs are those saved with the components (key "se", since task 9b); runs saved without them (task 9) have
+    (with a +-4 SE box, beyond 3.5 SE from the centre). For a normal posterior with SD = SE and that box
+    it is 2.3e-4; a value above 1e-2 is flagged, and that bound should be widened and the runs repeated.
+The SEs are those saved with the components (key "se"); runs saved without them (older runs) have
 half-width = 4 SE, so SE = half-width / 4 there.
 Writes runs.csv, parameters.csv and bounds.csv to the output folder, and prints a summary.
 """
@@ -87,10 +86,10 @@ def main():
         assert np.array_equal(r["comp"]["center"], c0["center"]) and np.array_equal(r["comp"]["half_width"], c0["half_width"]), \
             f"seed {r['seed']}: different prior bounds"
     center, hw = c0["center"], c0["half_width"]
-    # the MLE, saved since task 9c, when fixed bounds (main.limis_fixed_bounds) move the box centre away from it;
+    # the MLE, saved with the components, when fixed bounds (main.limis_fixed_bounds) move the box centre away from it;
     # earlier runs were centred at the MLE
     mle = c0["mle"] if "mle" in c0 else center
-    se = c0["se"] if "se" in c0 else hw / N_SE  # task 9 runs were saved without the SEs, with half-width = 4 SE
+    se = c0["se"] if "se" in c0 else hw / N_SE  # older runs were saved without the SEs, with half-width = 4 SE
 
     # per run
     rows, means, medians = [], [], []

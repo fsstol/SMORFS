@@ -1,4 +1,4 @@
-"""Task 5, other-cause mortality target (B4): the model value is a rate per living person.
+"""Other-cause mortality target (CORRECTIONS.md, entry 5): the model value is a rate per living person.
 
 At ages 35, 50, 65 and 80 and for each stage, the target eval_targets returns must equal
 lambda_US(t) * p_s(t), with lambda_US = -S_US'/S_US as the code builds it (smoothed derivative over

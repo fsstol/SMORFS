@@ -1,4 +1,4 @@
-"""The library runs on one thread, whatever BLAS it uses (branch speedup, entry 40).
+"""The library runs on one thread, whatever BLAS it uses (the performance work).
 
 With a BLAS (SMORFS_USE_BLAS), the library finds its threading control at run time (OpenBLAS, MKL, BLIS, Accelerate) and
 sets one thread around each matrix product, restoring the caller's setting afterwards. Checks:

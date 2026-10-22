@@ -10,8 +10,8 @@
    there. Their gates are internal (derivatives against finite differences, caches, quadrature, the R reference at
    given parameters, parameter recovery), so they hold on synthetic data.
 Tests of the paper's own results need the SEER data and references computed from it, and are not part of this
-repository: the targets against the published tables (T1), the hot start's objective, the MLE against its reference
-(T4, T4b, T4c, T4d), the LIMIS summary table against the reference SEs (summary), and the golden outputs (golden).
+repository: the targets against the published tables (T1), the hot start's objective, the MLE against its reference, the LIMIS
+summary table against the reference SEs, and the golden outputs.
 """
 import os
 import shutil

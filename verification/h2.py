@@ -27,7 +27,7 @@ def exact_targets(stage_groups):
     mo = pd.read_csv("../data/single-multiple/mortality_urinary_bladder.csv")
     mo = mo.loc[mo["SEER cause-specific death classification"] == "Dead (attributable to this cancer dx)"].copy()
     doa = pd.read_pickle("../data/single-multiple/doa_urinary bladder.pkl").reset_index(drop=False)
-    M.apply_corrected_denominators(df, mo, doa)  # only with main.corrected_denominators (entry 79), as main_rates
+    M.apply_corrected_denominators(df, mo, doa)  # with main.corrected_denominators (CORRECTIONS.md, entry 16), as main_rates
     # main.py halves Population here; deliberately NOT applied (SEER crude rate = Count/Population)
     df[P.stage_col] = df[P.stage_col].fillna("Blank(s)")
     df = df.loc[~df[P.stage_col].isin(['Blank(s)', 'Unknown/unstaged'])]

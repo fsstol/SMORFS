@@ -1,4 +1,4 @@
-"""Figure S1: accuracy of the Fourier inversion against the number of terms (CHANGES.md, entry 39).
+"""Figure S1: accuracy of the Fourier inversion against the number of terms.
 
     python tests/inversion_convergence.py      # about 2 min; writes output/inversion_convergence/
 
@@ -30,7 +30,7 @@ from common import ROOT, VER, load_h2  # noqa: E402
 
 PERIODS = [1, 2, 4, 6, 8, 10, 12, 14, 16, 20, 24]
 PAPER = 12
-REFERENCE_ERROR = 5.9e-6  # the R reference's step-halving error, h = 1/256 against 1/512 (CHANGES.md, entry 19)
+REFERENCE_ERROR = 5.9e-6  # the R reference's step-halving error, h = 1/256 against 1/512
 OUT = os.path.join(ROOT, "output", "inversion_convergence")
 POINT_AGES = np.concatenate([np.arange(0.25, 5.0 + 1e-9, 0.25), np.arange(6.0, 81.0)])
 STATES = ["T1", "T2", "T3", "D1", "D2", "D3", "E1", "E2", "E3"]

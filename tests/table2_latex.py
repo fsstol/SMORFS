@@ -1,8 +1,8 @@
-"""Table 2 as LaTeX, from the summary table (entry 84).
+"""Table 2 as LaTeX, from the summary table.
 
     python tests/table2_latex.py [--csv "output/final/urinary bladder CIs.csv"] [--out output/final/table2.tex]
 
-The cells are the summary table's strings as main_rates writes them (four decimal places, entry 76): the MLE with its
+The cells are the summary table's strings as main_rates writes them (four decimal places): the MLE with its
 95% CI from the observed information, and the LIMIS median with its 95% CrI. The layout, descriptions and caption are
 the paper's Table 2 as one of the authors supplied it (the caption's "palces" corrected).
 """

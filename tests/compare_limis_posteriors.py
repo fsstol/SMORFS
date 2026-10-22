@@ -7,7 +7,7 @@ Each set is pooled as tests/limis_diagnostics.py pools it (its load_run: target 
 sample of every run, no resampling) and summarised with its summarise (weighted mean, SD and 2.5%, 50% and 97.5%
 quantiles, log scale). Per parameter: both posterior SDs (log scale) and their ratio, and both sets' quantiles (natural
 scale) with their difference on the log scale divided by the reference set's posterior SD (column q.._diff_sd; the
-layout of output/wide_prior/posterior_wide_vs_4se.csv, entry 43).
+layout used for the paper's comparison of the wide and the +-4 SE priors).
 """
 import argparse
 import glob

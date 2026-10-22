@@ -1,4 +1,4 @@
-# T4c reference: task 8 (cumulative interval targets), corrected targets (entry 82), exact targets, analytic gradient and Hessian, saddle-free Newton from the Table 2 estimate
+# MLE reference: cumulative interval targets (CORRECTIONS.md entry 7), corrected targets (CORRECTIONS.md entry 16), exact targets, analytic gradient and Hessian, saddle-free Newton from the Table 2 estimate
 # objective=2181.6019506870 grad_norm=7.761e-09 (analytic gradient)
 parameter,log_value,value,se_log,ci_low,ci_high
 shape,1.99988668247,7.38821883677,0.00164993413743,7.3643648819,7.41215005712

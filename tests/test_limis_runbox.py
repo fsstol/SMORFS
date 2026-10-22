@@ -1,10 +1,9 @@
-"""runbox: a summary of saved LIMIS runs uses the runs' own prior box, not the box the current settings give
-(CHANGES.md, entries 46 and 48).
+"""runbox: a summary of saved LIMIS runs uses the runs' own prior box, not the box the current settings give.
 
 In a sandbox, src/limis_runs.py makes 2 tiny runs (n0 = 40, b = 20, 2 epochs) with the wide prior, max(0.3, 4 SE),
 in ../output/IMIS2_box. main.py then summarises them (load_IMIS = True, limis_n_draws = 200,
 limis_axes_to_bounds = True) with main.limis_min_half_width = None, so main_rates' own bounds are the +-4 SE box:
-the mismatch behind entry 46's error. The histogram x-limits IMIS2 draws are recorded.
+the mismatch behind an earlier error, in which a summary used main_rates' box. The histogram x-limits IMIS2 draws are recorded.
 Gates:
   - the runs' box (components files) differs from main_rates' +-4 SE box, so the test can tell them apart
   - every histogram x-limit equals the runs' box, exp(centre +- half-width), relative 1e-12

@@ -1,11 +1,11 @@
-"""Posterior correlations of a set of LIMIS runs (CHANGES.md, entries 47 and 84): the exits from each preclinical state,
+"""Posterior correlations of a set of LIMIS runs : the exits from each preclinical state,
 shape-scale, and the largest correlations outside those blocks.
 
     python tests/limis_correlations.py --samples output/IMIS2_corrected/samples --out output/final/exit_correlations.csv
 
 The runs are pooled as tests/limis_diagnostics.py pools them (its load_run: target / recomputed mixture density over
 every sample of every run, no resampling). Correlations are weighted, on the log scale and on the natural scale.
-Entry 47's third column (the 10,000 draws resampled for Figure 7, whose values the correlogram prints) is not
+The correlations of the 10,000 draws resampled for Figure 7, whose values the correlogram prints, are not
 recomputed here: it depends on the global random state of the figure run.
 """
 import argparse

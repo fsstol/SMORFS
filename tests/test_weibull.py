@@ -1,4 +1,4 @@
-"""Task 6, Weibull onset derivatives in the C++ library, checked below the objective.
+"""Weibull onset derivatives (CORRECTIONS.md, entry 6) in the C++ library, checked below the objective.
 
 Parameters u = log shape and v = log scale, at the Table 2 estimate. H0's only transition is the
 Weibull onset, so lib.eval_time on H0 leaves the risk stack in stack_risk and returns the state stack.

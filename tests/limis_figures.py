@@ -1,8 +1,8 @@
-"""Figures 3 to 7 (CLAUDE.md's "Figures 2 to 6") and the summary table (Table 2's MLE and LIMIS columns) from the
-saved task 9 LIMIS runs.
+"""Figures 3 to 7 and the summary table (Table 2's MLE and LIMIS columns) from the
+saved LIMIS runs.
 
     python tests/limis_figures.py                                  # about 7 min on an M4 Max
-    python tests/limis_figures.py --limis-dir output/IMIS2_wide    # task 9b, the wide-prior runs
+    python tests/limis_figures.py --limis-dir output/IMIS2_wide    # wide-prior runs
     python tests/limis_figures.py --limis-dir output/IMIS2_wide --steps posterior --axes-to-bounds \
         --dest output/wide_prior      # Figures 6 and 7 of the wide-prior runs, axes at the prior bounds
 
@@ -14,7 +14,7 @@ model.py's own code, in its own process run from src/ (parameters.py is not edit
   2. posterior: main.py with run_IMIS = load_IMIS = True, as in parameters.py otherwise: pooled weighted quantiles
      (CIs.csv), the posterior target bands, histograms and correlogram, from limis_n_draws draws resampled by weight.
   3. MLE fit: the model at output/urinary bladder mle.npy, eval_targets(plot=True) and save_plot, with the targets
-     main.py builds (verification/h2.py's build, checked against main.py's objective by T1d).
+     main.py builds (verification/h2.py's build, checked against main.py's objective on the SEER data).
 main.py writes into LIMIS_DIR (git-ignored); the target table is not rewritten (write_rates_table = False).
 save_plot writes PDF only; here it also writes a PNG at 300 dpi. The correlogram uses DejaVu Sans (see CHILD).
 The figures and the table are then copied to the committed names in output/ (for another LIMIS_DIR, to

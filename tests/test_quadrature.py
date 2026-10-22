@@ -1,7 +1,6 @@
-"""The shared adaptive quadrature of the general states' transforms (branch speedup, entries 11 and 19).
+"""The shared adaptive quadrature of the general states' transforms (the performance work).
 
-H0's stack (value, gradient, Hessian) at the 120 frequencies of the inversion, at the parameter sets of SPEEDUP.md
-entry 11: the Table 2 estimate, the MLE, 5 draws within +-1 of the MLE on the log scale, and Weibull shapes x0.14 to
+H0's stack (value, gradient, Hessian) at the 120 frequencies of the inversion, at these parameter sets: the Table 2 estimate, the MLE, 5 draws within +-1 of the MLE on the log scale, and Weibull shapes x0.14 to
 x7.39 (k = 1.0 to 55) and scales x0.5 to x2. Three methods: quad_vec_multi (one subdivision for all frequencies, used
 by evaluate), quad_vec per frequency (v2's method), and Gauss-Kronrod 21 on 2,000 equal subintervals of [0.1, 200] as the
 reference, graded geometrically towards t = 0 (60 subintervals from 1e-14 to 0.1), where the derivatives with respect

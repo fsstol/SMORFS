@@ -108,8 +108,9 @@ entry whose check needs the SEER data says "verified on the SEER data; not in th
   - It backtracks by halving until the Armijo condition holds.
   - The optimizer stops when the gradient norm is below `newton_tol`.
   - v2's schedule remains behind `newton_damped = True`.
-- **Test:** `recovery` (on synthetic data, `main.py`'s default optimizer converges, with gradient norm below 1e-5, and
-  recovers the generating parameters).
+- **Test:** `recovery` (on synthetic data, `main.py`'s default optimizer converges and recovers the generating
+  parameters; the test sets `newton_tol` to 1e-8, so that the optimizer stops only when no step lowers the objective
+  any more, and gates the gradient norm at 1e-5).
 
 ## The library
 

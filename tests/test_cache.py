@@ -1,11 +1,11 @@
-"""The library's caches recompute whenever their inputs change (branch speedup, entries 20 and 21).
+"""The library's caches recompute whenever their inputs change (the performance work).
 
 One model makes a sequence of get_arrival / get_prevalence calls that change one input at a time. Every result must
 equal, bit for bit, the same call on a freshly built model (empty caches), and the cache counters
 (lib.get_cache_stats: transform computations and reuses, basis computations and reuses) must show a reuse exactly
 when nothing the cache depends on changed.
-Series basis (entry 20): depends on the time grid t (bit for bit), t0 and the Fourier options A, l, periods.
-Transforms (entry 21): depend on the parameters (however they were set), eval_order, t0 and the Fourier options, the
+Series basis: depends on the time grid t (bit for bit), t0 and the Fourier options A, l, periods.
+Transforms: depend on the parameters (however they were set), eval_order, t0 and the Fourier options, the
 cut-off states, the initial state and the model's layout (update). Arrival or prevalence, cumulative and terminal flags
 only change the assembly, so they reuse the transforms. Changes persist from step to step; the fresh model replays all
 of them before its call.

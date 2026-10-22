@@ -1,4 +1,4 @@
-"""limis: SingularCancer.IMIS0, unmodified, on a toy target with a known posterior (CHANGES.md, entry 20).
+"""limis: SingularCancer.IMIS0, unmodified, on a toy target with a known posterior (CORRECTIONS.md, entry 8).
 
 The model is replaced by a 3-parameter stand-in whose objective is 0.5 (x - MU)' A (x - MU), so the posterior
 inside the prior box (centre 0, half-width 0.3) is, to within 1e-20, normal with mean MU and SDs SD. IMIS0 and

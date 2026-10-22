@@ -1,4 +1,4 @@
-"""The Gompertz, log-normal and log-logistic risks (branch speedup, entry 31).
+"""The Gompertz, log-normal and log-logistic risks (the performance work).
 
 Parameters, as Weibull's, on the log scale where they are positive: Gompertz (shape b, any sign; log rate a), log-normal
 (meanlog; log sdlog), log-logistic (log shape; log scale).

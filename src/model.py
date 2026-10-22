@@ -21,7 +21,7 @@ class SingularCancer(SemiMarkov):
     # posterior (or prior) draws, resampled by weight, for the figures and the target bands; the parameter
     # quantiles use every sample with its weight instead (limis_quantiles)
     limis_n_draws = 10000
-    # folder of the LIMIS runs: samples/ and the summary figures and tables; the wide-prior runs (task 9b) use
+    # folder of the LIMIS runs: samples/ and the summary figures and tables; the wide-prior runs use
     # ../output/IMIS2_wide, so the +-4 SE runs in ../output/IMIS2 stay for the sensitivity comparison
     limis_dir = "../output/IMIS2"
     # True: IMIS2 also draws the histograms and the correlogram with axes set to the prior bounds (exp(center +-

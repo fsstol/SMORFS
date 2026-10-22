@@ -1,4 +1,4 @@
-"""Task 9: independent LIMIS runs of main.py, one process per seed, spread across the cores.
+"""Independent LIMIS runs of main.py, one process per seed, spread across the cores.
 
 Each run is main.py's main_rates_all(seed) in its own process, exactly as `python main.py --seed SEED`, with three
 settings overridden at run time (parameters.py is not edited):
@@ -9,8 +9,8 @@ settings overridden at run time (parameters.py is not edited):
 The LIMIS settings (n0, b, epochs_IMIS, delta, ptime, steps, deg) are parameters.py's unless --n0, --b or --epochs
 are given (smoke test only). The prior is uniform on the log scale, centred at ../output/urinary bladder mle.npy,
 half-width SingularCancer.limis_n_se information-matrix SEs (model.limis_bounds), or max(--min-half-width, that) per
-parameter when --min-half-width is given (task 9b, the wide prior); --fixed-bounds NAME=LO:HI,... replaces that rule by
-fixed natural-scale bounds for the parameters named, as in main_rates' bounds table (task 9c: Incidence_1 and
+parameter when --min-half-width is given (the wide prior); --fixed-bounds NAME=LO:HI,... replaces that rule by
+fixed natural-scale bounds for the parameters named, as in main_rates' bounds table (for example Incidence_1 and
 Incidence_2, the Weibull shape and scale). A run raises before sampling if that file is missing, its information
 matrix is not positive definite, a name is unknown or a fixed box does not contain the MLE. --limis-dir (default
 ../output/IMIS2) is where the samples and logs go (SingularCancer.limis_dir). Runs share no state: main_rates seeds
@@ -19,10 +19,10 @@ Only the first seed launched writes the target table ../output/urinary bladder_r
 the others skip it, so no two processes write the same file.
 
 Run from src/:
-    python limis_runs.py --seeds 0-19 --workers 20                       # task 9
-    python limis_runs.py --seeds 0-19 --workers 20 --min-half-width 0.3 --limis-dir ../output/IMIS2_wide  # task 9b
+    python limis_runs.py --seeds 0-19 --workers 20                       # prior +-4 SE
+    python limis_runs.py --seeds 0-19 --workers 20 --min-half-width 0.3 --limis-dir ../output/IMIS2_wide  # wide prior
     python limis_runs.py --seeds 0-19 --workers 20 --min-half-width 0.3 \
-        --fixed-bounds Incidence_1=7:8,Incidence_2=130:140 --limis-dir ../output/IMIS2_weibull           # task 9c
+        --fixed-bounds Incidence_1=7:8,Incidence_2=130:140 --limis-dir ../output/IMIS2_weibull           # fixed Weibull bounds
     python limis_runs.py --seeds 0-1 --n0 40 --b 20 --epochs 2           # smoke test (tests/limis_smoke.py)
 Logs: LIMIS_DIR/logs/seed_SS.log (one per run) and LIMIS_DIR/logs/runs.csv (seed, status, seconds).
 """
@@ -115,9 +115,9 @@ def main():
     parser.add_argument("--epochs", type=int, default=0, help="smoke test only; default parameters.py's epochs_IMIS")
     parser.add_argument("--limis-dir", default="../output/IMIS2", help="where samples/ and logs/ go")
     parser.add_argument("--min-half-width", type=float, default=None,
-                        help="log-scale floor of the prior half-width, max(this, limis_n_se SE); task 9b: 0.3")
+                        help="log-scale floor of the prior half-width, max(this, limis_n_se SE); the wide prior: 0.3")
     parser.add_argument("--fixed-bounds", type=parse_fixed_bounds, default=None, metavar="NAME=LO:HI,...",
-                        help="fixed natural-scale prior bounds for these parameters; task 9c: "
+                        help="fixed natural-scale prior bounds for these parameters; for example "
                              "Incidence_1=7:8,Incidence_2=130:140")
     args = parser.parse_args()
     if not os.path.exists("main.py"):

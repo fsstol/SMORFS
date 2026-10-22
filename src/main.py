@@ -15,15 +15,15 @@ pd.options.display.max_rows = 20
 # main_rates writes the target table ../output/<cancer>_rates.csv; parallel runs (limis_runs.py) set this False in all
 # but one process, because concurrent writes of the same file can corrupt it even when the content is identical
 write_rates_table = True
-# LIMIS prior half-width floor on the log scale: None gives limis_n_se SE throughout (task 9); 0.3, v2's half-width,
-# gives max(0.3, limis_n_se SE) per parameter (task 9b, the wide prior; limis_runs.py --min-half-width)
+# LIMIS prior half-width floor on the log scale: None gives limis_n_se SE throughout (the +-4 SE prior); 0.3, v2's half-width,
+# gives max(0.3, limis_n_se SE) per parameter (the wide prior, the paper's; limis_runs.py --min-half-width)
 limis_min_half_width = None
 # LIMIS prior: fixed natural-scale bounds for chosen parameters, {name as in the bounds table: (lower, upper)}, e.g.
-# {"Incidence_1": (7.0, 8.0), "Incidence_2": (130.0, 140.0)} for the Weibull shape and scale (task 9c;
+# {"Incidence_1": (7.0, 8.0), "Incidence_2": (130.0, 140.0)} for the Weibull shape and scale (
 # limis_runs.py --fixed-bounds); the other parameters keep the rule above. None (the default): none fixed
 limis_fixed_bounds = None
-# Denominators of the clinical mortality and deaths-at-diagnosis targets (entries 79 and 81). True (the default since
-# entry 81, the paper's targets): both are SEER 17's person-years of 2004 to 2021 by single year of age, from the rates
+# Denominators of the clinical mortality and deaths-at-diagnosis targets (CORRECTIONS.md, entry 16). True (the default
+# since v1.0.1, the paper's targets): both are SEER 17's person-years of 2004 to 2021 by single year of age, from the rates
 # file, the incidence targets' own denominators. False: the original analysis's targets, each file's own population: the
 # incidence-based mortality file's person-years of 2000 to 2021, and the pickle's of 2004 to 2021, which equal the
 # SEER 22 area's (SEER 17 plus Idaho, Illinois, Massachusetts, New York and Texas), about 1.8 times SEER 17's

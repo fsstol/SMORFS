@@ -1,4 +1,4 @@
-"""Task 10, the benchmark (Table 3): the independent R reference and the SMORFS timings, on one machine.
+"""The benchmark (Table 3): the independent R reference and the SMORFS timings, on one machine.
 
     python tests/benchmark.py            # about 5 min; run with nothing else on the machine
 
@@ -16,7 +16,7 @@ interval targets), at the rounded Table 2 parameters hard-coded in the R script 
 REPEATS runs after one warm-up, for the objective alone, with the gradient, and with the Hessian; the same timing
 protocol as verification/smorfs_benchmark.py. Also at the corrected MLE, for information.
 SMORFS accuracy: T3b (tests/test_t3b_accuracy.py), eval_targets against the reference written by this run, not
-smorfs_benchmark.py's figures (CHANGES.md, entry 15: its denominator uses the H0 prevalence).
+smorfs_benchmark.py's figures (its denominator uses the H0 prevalence).
 """
 import os
 import platform

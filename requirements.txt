@@ -1,5 +1,4 @@
-# Python 3.12.15. These are the versions of the environment that produced the results (CHANGES.md, entries 19
-# and 36): conda env `smorfs` on macOS 26.6.2, Apple M4 Max. environment.yml lists the same environment in full.
+# Python 3.12.15. These are the versions of the environment that produced the results: conda env `smorfs` on macOS 26.6.2, Apple M4 Max. environment.yml lists the same environment in full.
 # The C++ library is built with `bash compile.sh` (any C++20 compiler; Apple clang 21.0.0 was used).
 # Table 3 also needs R (4.5.3 was used); verification/bladder_reference_check.R uses base R only.
 

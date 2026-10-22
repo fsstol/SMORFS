@@ -13,8 +13,8 @@ by the model's own person-time alive, which falls below 1 by the cancer deaths (
 T3b therefore multiplies eval_targets' rates by 1 / integral(alive), with alive = 1 - F_lifetime from
 SMORFS's cumulative inversion (16 Gauss-Legendre nodes per year). The correction is at most 2.9e-3, so a
 relative error of 1e-3 in it would add at most 3e-6. It does not use the H0 prevalence, which is
-inaccurate at young ages (CHANGES.md, task 8).
-Gate (task 8): max relative error <= 2e-4. The grid summation of v2 (cumulative_targets = False, reported\nfor comparison) gives about 1.05e-2.
+inaccurate at young ages (CORRECTIONS.md, entry 7).
+Gate (CORRECTIONS.md, entry 7): max relative error <= 2e-4. The grid summation of v2 (cumulative_targets = False, reported\nfor comparison) gives about 1.05e-2.
 """
 import numpy as np
 import pandas as pd
