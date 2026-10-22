@@ -1,4 +1,4 @@
-"""Shared helpers for the SMORFS regression tests (T1 to T4 in CLAUDE.md).
+"""Shared helpers for the SMORFS regression tests.
 
 The tests import verification/h2.py instead of copying it, so the verification material stays the
 single source of the checks. Anything that writes files (main.py writes into output/,
@@ -16,8 +16,8 @@ import numpy as np
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 VER = os.path.join(ROOT, "verification")
 TABLE2 = os.path.join(ROOT, "output", "urinary bladder.npy")
-PUBLISHED = os.path.join(VER, "published_targets.csv")  # the original analysis's targets (uncorrected denominators)
-CORRECTED = os.path.join(VER, "corrected_targets.csv")  # the corrected targets (entry 81; make_corrected_targets.py)
+PUBLISHED = os.path.join(VER, "published_targets.csv")  # a table built from the SEER data; not in this repository
+CORRECTED = os.path.join(VER, "corrected_targets.csv")  # a table built from the SEER data; not in this repository
 LIBRARY = "semi_markov.dll" if sys.platform == "win32" else "semi_markov.so"  # as src/semi_markov/base.py
 DATA_FILES = ["US_life_table_2021.csv",
               "single-multiple/rates_urinary_bladder.csv",
@@ -39,7 +39,7 @@ def row(test, quantity, value, gate, passed, note=""):
 
 
 def build(h2, corrected=True):
-    """h2.build("model") with the corrected targets (main.py's default since entry 81) or, corrected=False, the
+    """h2.build("model") with the corrected targets (main.py's default since v1.0.1, CORRECTIONS.md entry 16) or, corrected=False, the
     original analysis's (uncorrected denominators). main.corrected_denominators is restored afterwards."""
     saved = h2.M.corrected_denominators
     h2.M.corrected_denominators = corrected
@@ -141,8 +141,11 @@ M.run_IMIS = False
 M.hot_start_save = True
 M.epochs_hess = int(sys.argv[1])
 M.newton_damped = bool(int(sys.argv[2]))
-if len(sys.argv) > 3 and sys.argv[3] == "uncorrected":
-    M.corrected_denominators = False
+for arg in sys.argv[3:]:
+    if arg == "uncorrected":
+        M.corrected_denominators = False
+    elif arg.startswith("newton_tol="):
+        M.newton_tol = float(arg.split("=", 1)[1])
 log = open("../refit_log.jsonl", "w")
 _eval_targets = M.SingularCancer.eval_targets
 def eval_targets(self, *args, **kwargs):
@@ -157,13 +160,15 @@ M.main_rates_all(seed=0)
 '''
 
 
-def run_refit(epochs, damped=False, corrected=True):
-    """Run main.py's refit in a sandbox, with the corrected targets or (corrected=False) the original analysis's.
-    Returns (sandbox dir, completed process, log, saved estimate or None)."""
+def run_refit(epochs, damped=False, corrected=True, newton_tol=None):
+    """Run main.py's refit in a sandbox, with the corrected targets or (corrected=False) the original analysis's, and
+    main.newton_tol replaced by newton_tol when it is given. Returns (sandbox dir, completed process, log, saved
+    estimate or None)."""
     d = make_sandbox(hot_start=True)
     env = dict(os.environ, MPLBACKEND="Agg")
-    proc = subprocess.run([sys.executable, "-c", REFIT_DRIVER, str(epochs), str(int(damped))]
-                          + ([] if corrected else ["uncorrected"]), cwd=os.path.join(d, "src"),
+    extra = ([] if corrected else ["uncorrected"]) + ([] if newton_tol is None else [f"newton_tol={newton_tol!r}"])
+    proc = subprocess.run([sys.executable, "-c", REFIT_DRIVER, str(epochs), str(int(damped))] + extra,
+                          cwd=os.path.join(d, "src"),
                           env=env, capture_output=True, text=True, timeout=14400)
     log = []
     if os.path.exists(os.path.join(d, "refit_log.jsonl")):
@@ -196,7 +201,7 @@ def newton_analytic(h2, m, th, iters=20, tol=1e-5):
 
 
 def write_mle_reference(path, h2, th, fv, gn, H, header):
-    """Write an MLE reference in the format of verification/provisional_corrected_mle_reference.csv."""
+    """Write an MLE reference in the format of tests/cumulative_mle_reference.csv."""
     import pandas as pd
     se = np.sqrt(np.diag(np.linalg.inv(H)))
     df = pd.DataFrame({"parameter": h2.NAMES, "log_value": th, "value": np.exp(th), "se_log": se,
